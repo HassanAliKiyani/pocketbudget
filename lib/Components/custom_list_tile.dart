@@ -40,23 +40,26 @@ class CustomListTile extends StatelessWidget {
         ]),
         child: Container(
           decoration: BoxDecoration(
-            // color: Colors.grey.shade600pr,
-              color: Theme.of(context).colorScheme.primary,
+              // color: Colors.grey.shade600pr,
+              color: Theme.of(context).colorScheme.tertiary,
               borderRadius: BorderRadius.circular(4.0)),
           child: ListTile(
             title: Text(
               title,
               style: TextStyle(
-                color: Theme.of(context).colorScheme.tertiary,
+                color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
               ),
             ),
-            trailing: Text(trailing,style: TextStyle(
-                color: Theme.of(context).colorScheme.tertiary,
+            trailing: Text(
+              trailing,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
-              ),),
+              ),
+            ),
           ),
         ),
       ),

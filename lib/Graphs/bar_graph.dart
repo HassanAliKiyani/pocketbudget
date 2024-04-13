@@ -112,40 +112,40 @@ class _MyBarGraphState extends State<MyBarGraph> {
     String text;
     switch ((value.toInt() + widget.startMonth - 1) % 12) {
       case 0:
-        text = 'J';
+        text = 'JAN';
         break;
       case 1:
-        text = 'F';
+        text = 'FEB';
         break;
       case 2:
-        text = 'M';
+        text = 'MAR';
         break;
       case 3:
-        text = 'A';
+        text = 'APR';
         break;
       case 4:
-        text = 'M';
+        text = 'MAY';
         break;
       case 5:
-        text = 'J';
+        text = 'JUN';
         break;
       case 6:
-        text = 'J';
+        text = 'JUL';
         break;
       case 7:
-        text = 'A';
+        text = 'AUG';
         break;
       case 8:
-        text = 'S';
+        text = 'SEP';
         break;
       case 9:
-        text = 'O';
+        text = 'OCT';
         break;
       case 10:
-        text = 'N';
+        text = 'NOV';
         break;
       case 11:
-        text = 'D';
+        text = 'DEC';
         break;
       default:
         text = '';
