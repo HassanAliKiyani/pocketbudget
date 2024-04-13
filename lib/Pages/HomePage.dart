@@ -108,18 +108,18 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Consumer<ExpenseDatabase>(builder: (context, value, child) {
       // Get the starting dates for the data
-      int startMonth = value.getStartMonth();
-      int startYear = value.getStartYear();
+      // int startMonth = value.getStartMonth();
+      // int startYear = value.getStartYear();
       int currentMonth = DateTime.now().month;
       int currentYear = DateTime.now().year;
 
       // Calculate the number of months since the stating date
-      int numberOfMonths = calculateNumberOfMonth(
-        startYear: startYear,
-        startMonth: startMonth,
-        currentYear: currentYear,
-        currentMonth: currentMonth,
-      );
+      // int numberOfMonths = calculateNumberOfMonth(
+      //   startYear: startYear,
+      //   startMonth: startMonth,
+      //   currentYear: currentYear,
+      //   currentMonth: currentMonth,
+      // );
       // Only display the expenses for the current month
       List<Expense> expenseOfCurrentMonth = value.allExpenses.where((expense) {
         return expense.date.month == currentMonth &&
@@ -142,7 +142,7 @@ class _HomePageState extends State<HomePage> {
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(formatAmount(snapshot.data ?? 0)),
+                    Text(convertAmountToCurreny(snapshot.data ?? 0)),
                     Text(getMonthInitials(DateTime.now().month)),
                   ],
                 );
@@ -213,7 +213,8 @@ class _HomePageState extends State<HomePage> {
                           expenseOfCurrentMonth[reverseIndex];
                       return CustomListTile(
                         title: individualExpense.name,
-                        trailing: formatAmount(individualExpense.amount),
+                        trailing:
+                            convertAmountToCurreny(individualExpense.amount),
                         onEditPressed: (context) =>
                             editExpenseBox(expense: individualExpense),
                         onDeletePressed: (context) =>

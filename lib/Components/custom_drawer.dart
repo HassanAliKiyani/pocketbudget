@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pocketbudget/Pages/SettingsPage.dart';
+import 'package:pocketbudget/Pages/WalletPage.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
@@ -43,6 +44,32 @@ class CustomDrawer extends StatelessWidget {
             padding: const EdgeInsets.only(left: 25.0, top: 0),
             child: ListTile(
               title: Text(
+                "W A L L E T S",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+              leading: Icon(
+                Icons.wallet_giftcard,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              onTap: () {
+                //Pop the drawer
+                Navigator.pop(context);
+                //Navigate to the settings page
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const WalletPage()));
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 25.0, top: 0),
+            child: ListTile(
+              title: Text(
                 "S E T T I N G S",
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
@@ -58,11 +85,13 @@ class CustomDrawer extends StatelessWidget {
                 //Pop the drawer
                 Navigator.pop(context);
                 //Navigate to the settings page
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const SettingsPage()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SettingsPage()));
               },
             ),
-          ),
+          )
         ],
       ),
     );

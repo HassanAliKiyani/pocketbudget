@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:pocketbudget/Database/database_init.dart';
 import 'package:pocketbudget/Database/expense_database.dart';
+import 'package:pocketbudget/Database/wallet_datebase.dart';
 import 'package:pocketbudget/Pages/HomePage.dart';
 import 'package:pocketbudget/Theme/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  //initialize database
-  await ExpenseDatabase.initialize();
+  //initialize all databases
+  await IsarDatabaseInitializer.initialize();
 
   runApp(
     MultiProvider(
@@ -18,6 +20,9 @@ void main() async {
         ChangeNotifierProvider<ThemeProvider>(
           create: (context) => ThemeProvider(),
         ),
+        ChangeNotifierProvider<WalletDatabase>(
+          create: (context) => WalletDatabase(),
+        )
       ],
       child: const MyApp(),
     ),

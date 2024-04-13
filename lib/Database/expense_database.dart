@@ -1,25 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
+import 'package:pocketbudget/Database/database_init.dart';
 import 'package:pocketbudget/Models/expense.dart';
-import 'package:path_provider/path_provider.dart';
 
 class ExpenseDatabase extends ChangeNotifier {
-  static late Isar isar;
   List<Expense> _allExpenses = [];
   /*
     S E T U P
  */
 
-  //initialize the data base
-
-  static Future<void> initialize() async {
-    final dir = await getApplicationDocumentsDirectory();
-    isar = await Isar.open([ExpenseSchema], directory: dir.path);
-  }
-
   /// G E T T E R S
 
-  Isar get isarInstance => isar;
   List<Expense> get allExpenses => _allExpenses;
 
   /*
@@ -28,7 +19,8 @@ class ExpenseDatabase extends ChangeNotifier {
   //CREATE - new expenses
   Future<void> createNewExpense(Expense newExpense) async {
     //add to db
-    await isar.writeTxn(() => isar.expenses.put(newExpense));
+    await IsarDatabaseInitializer.isar
+        .writeTxn(() => IsarDatabaseInitializer.isar.expenses.put(newExpense));
 
     //re-read
     await readExpenses();
@@ -39,7 +31,8 @@ class ExpenseDatabase extends ChangeNotifier {
 
   //READ - expenses from database
   Future<void> readExpenses() async {
-    List<Expense> fetchExpenseFromDb = await isar.expenses.where().findAll();
+    List<Expense> fetchExpenseFromDb =
+        await IsarDatabaseInitializer.isar.expenses.where().findAll();
 
     _allExpenses.clear();
     _allExpenses.addAll(fetchExpenseFromDb);
@@ -54,7 +47,8 @@ class ExpenseDatabase extends ChangeNotifier {
     //new expense has the same id
     updatedExpense.id = id;
 
-    await isar.writeTxn(() => isar.expenses.put(updatedExpense));
+    await IsarDatabaseInitializer.isar.writeTxn(
+        () => IsarDatabaseInitializer.isar.expenses.put(updatedExpense));
     //re-read
     await readExpenses();
 
@@ -64,7 +58,8 @@ class ExpenseDatabase extends ChangeNotifier {
 
   //DELETE
   Future<void> deleteExpense(int id) async {
-    await isar.writeTxn(() => isar.expenses.delete(id));
+    await IsarDatabaseInitializer.isar
+        .writeTxn(() => IsarDatabaseInitializer.isar.expenses.delete(id));
 
     //re-read
     await readExpenses();
