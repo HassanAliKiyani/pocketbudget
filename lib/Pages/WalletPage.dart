@@ -49,7 +49,8 @@ class _WalletPageState extends State<WalletPage> {
   Widget build(BuildContext context) {
     return Consumer<WalletDatabase>(builder: (context, value, child) {
       List<Wallet> _allWallets = value.allWallets;
-      print("Getting from data base ${_allWallets.length}");
+      double total =
+          value.allWallets.fold(0, (sum, wallet) => sum + wallet.amount);
 
       return Scaffold(
         appBar: AppBar(
@@ -61,11 +62,32 @@ class _WalletPageState extends State<WalletPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              width: MediaQuery.of(context).size.width * 0.94,
-              child: TextButton(
-                onPressed: openWalletBox,
-                child: const Text("Add Wallet"),
+              padding: const EdgeInsets.all(16.0),
+              margin: const EdgeInsets.all(25.0),
+              decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.inversePrimary,
+                  borderRadius: BorderRadius.circular(12.0)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Wallet Total:",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    convertAmountToCurreny(total),
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  )
+                ],
               ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                // foregroundColor: Theme.of(context).colorScheme.secondary,
+                backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+              ),
+              onPressed: openWalletBox,
+              child: const Text("Add Wallet"),
             ),
             Expanded(
                 child: GridView.builder(

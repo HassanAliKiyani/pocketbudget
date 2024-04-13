@@ -114,7 +114,7 @@ class ExpenseDatabase extends ChangeNotifier {
     return _allExpenses.first.date.year;
   }
 
-  Future<double> calculateCuurentMonthExpenses() async {
+  Future<double> calculateCurentMonthExpenses() async {
     await readExpenses();
 
     int currentMonth = DateTime.now().month;

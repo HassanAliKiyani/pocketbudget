@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage> {
         .calculateMonthlyTotalExpenses();
     _calculateCurrentMonthTotal =
         Provider.of<ExpenseDatabase>(context, listen: false)
-            .calculateCuurentMonthExpenses();
+            .calculateCurentMonthExpenses();
   }
 
   //Create Expense Box
