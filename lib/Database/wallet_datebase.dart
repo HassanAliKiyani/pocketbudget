@@ -5,7 +5,6 @@ import 'package:pocketbudget/Models/wallet.dart';
 
 class WalletDatabase extends ChangeNotifier {
   List<Wallet> _allWallets = [];
-  
 
   List<Wallet> get allWallets => _allWallets;
 
@@ -36,7 +35,6 @@ class WalletDatabase extends ChangeNotifier {
           await IsarDatabaseInitializer.isar.wallets.where().findAll();
 
       _allWallets.clear();
-      print(fetchWalletFromDb.length);
       _allWallets.addAll(fetchWalletFromDb);
 
       //notify UI

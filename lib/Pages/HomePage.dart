@@ -1,9 +1,11 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pocketbudget/Components/custom_drawer.dart';
 import 'package:pocketbudget/Components/custom_list_tile.dart';
 import 'package:pocketbudget/Database/expense_database.dart';
+import 'package:pocketbudget/Database/wallet_datebase.dart';
 import 'package:pocketbudget/Graphs/bar_graph.dart';
 import 'package:pocketbudget/Models/expense.dart';
 import 'package:pocketbudget/Helper/helper_functions.dart';
@@ -24,10 +26,15 @@ class _HomePageState extends State<HomePage> {
 
   Future<double>? _calculateCurrentMonthTotal;
 
+  List<String> dropdownWallets = [];
+  String? selectedWallet;
+  bool isExpense = true;
+
   @override
   void initState() {
     //initial load call to read expenses
     Provider.of<ExpenseDatabase>(context, listen: false).readExpenses();
+    Provider.of<WalletDatabase>(context, listen: false).readWallets();
 
     //Future to refresh the bar graph data
     refreshData();
@@ -45,25 +52,80 @@ class _HomePageState extends State<HomePage> {
 
   //Create Expense Box
   void openExpenseBox() {
+    dropdownWallets.clear();
+    Provider.of<WalletDatabase>(context, listen: false)
+        .allWallets
+        .forEach((element) {
+      dropdownWallets.add(element.name);
+    });
     showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-              title: Text("New Expense"),
-              content: Column(mainAxisSize: MainAxisSize.min, children: [
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(hintText: "Name"),
-                ),
-                TextField(
-                  controller: amountController,
-                  decoration: const InputDecoration(hintText: "Amount"),
-                )
-              ]),
-              actions: [
-                _createButton(),
-                _cancelButton(),
-              ],
-            ));
+        builder: (context) =>
+            StatefulBuilder(builder: (context, StateSetter setState) {
+              return AlertDialog(
+                title: Text("New Expense"),
+                content: Column(mainAxisSize: MainAxisSize.min, children: [
+                  TextField(
+                    controller: nameController,
+                    decoration: const InputDecoration(hintText: "Name"),
+                  ),
+                  TextField(
+                    controller: amountController,
+                    decoration: const InputDecoration(hintText: "Amount"),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Wallet",
+                      ),
+                      DropdownButton<String>(
+                          borderRadius: BorderRadius.circular(10.0),
+                          padding: EdgeInsets.symmetric(vertical: 12.0),
+                          value: selectedWallet ?? "default",
+                          items: [
+                            const DropdownMenuItem(
+                              value: "default",
+                              child: Text("Default"),
+                            ),
+                            ...dropdownWallets.map((e) => DropdownMenuItem(
+                                  value: e,
+                                  child: Text(e),
+                                ))
+                          ],
+                          onChanged: (String? newSelect) {
+                            if (newSelect != null) {
+                              setState(() {
+                                selectedWallet = newSelect;
+                              });
+                            }
+                          }),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        isExpense ? "Expense" : "Income",
+                      ),
+                      CupertinoSwitch(
+                          activeColor: Colors.red,
+                          trackColor: Colors.green,
+                          value: isExpense,
+                          onChanged: (value) {
+                            setState(() {
+                              isExpense = value;
+                            });
+                          })
+                    ],
+                  ),
+                ]),
+                actions: [
+                  _createButton(),
+                  _cancelButton(),
+                ],
+              );
+            }));
   }
 
   //Edit Expense Box
@@ -162,7 +224,7 @@ class _HomePageState extends State<HomePage> {
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.done) {
                           Map<String, double> monthlyData = snapshot.data ?? {};
-                          print(monthlyData);
+                          // print(monthlyData);
                           int startMonth = value.getStartMonth();
                           int startYear = value.getStartYear();
                           int numberOfMonths = calculateNumberOfMonth(
@@ -186,11 +248,11 @@ class _HomePageState extends State<HomePage> {
                             // print(month);
 
                             String key = "${year}_$month";
-                            print(key);
+                            // print(key);
 
                             return monthlyData[key] ?? 0.0;
                           });
-                          print(monthlySummary);
+                          // print(monthlySummary);
 
                           return MyBarGraph(
                               monthlySummary: monthlySummary,
@@ -240,11 +302,11 @@ class _HomePageState extends State<HomePage> {
           Expense newExpense = Expense(
               name: nameController.text,
               amount: convertStringToDouble(amountController.text),
-              date: DateTime.now());
+              date: DateTime.now(),
+              wallet: selectedWallet!);
           //Save expense to database
           await context.read<ExpenseDatabase>().createNewExpense(newExpense);
-          nameController.clear();
-          amountController.clear();
+          resetActions();
           refreshData();
         }
       },
@@ -275,8 +337,7 @@ class _HomePageState extends State<HomePage> {
           await context
               .read<ExpenseDatabase>()
               .updateExpense(existingId, updatedExpense);
-          nameController.clear();
-          amountController.clear();
+          resetActions();
           refreshData();
         }
       },
@@ -287,8 +348,7 @@ class _HomePageState extends State<HomePage> {
   Widget _deleteExpenseButton(Expense expense) {
     return MaterialButton(
       onPressed: () async {
-        nameController.clear();
-        amountController.clear();
+        resetActions();
         Navigator.pop(context);
         await context.read<ExpenseDatabase>().deleteExpense(expense.id);
         refreshData();
@@ -303,11 +363,16 @@ class _HomePageState extends State<HomePage> {
   Widget _cancelButton() {
     return MaterialButton(
       onPressed: () {
-        nameController.clear();
-        amountController.clear();
+        resetActions();
         Navigator.pop(context);
       },
       child: Text("Cancel"),
     );
+  }
+
+  void resetActions() {
+    nameController.clear();
+    amountController.clear();
+    selectedWallet = "default";
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:pocketbudget/Pages/SettingsPage.dart';
 import 'package:pocketbudget/Pages/WalletPage.dart';
 
@@ -13,6 +14,9 @@ class CustomDrawer extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           DrawerHeader(
+            // child: Lottie.network(
+            //     "https://lottie.host/embed/6709e27f-04c8-4d01-b5cd-0b83442c871c/zOUPRnINEa.json",
+            //     animate: true),
             child: Icon(
               Icons.wallet_outlined,
               size: 50,
