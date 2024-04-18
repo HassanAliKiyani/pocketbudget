@@ -2,13 +2,18 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:isar/isar.dart';
+import 'package:lottie/lottie.dart';
 import 'package:pocketbudget/Components/custom_drawer.dart';
 import 'package:pocketbudget/Components/custom_list_tile.dart';
+import 'package:pocketbudget/Components/progress_loader.dart';
 import 'package:pocketbudget/Database/expense_database.dart';
 import 'package:pocketbudget/Database/wallet_datebase.dart';
 import 'package:pocketbudget/Graphs/bar_graph.dart';
 import 'package:pocketbudget/Models/expense.dart';
 import 'package:pocketbudget/Helper/helper_functions.dart';
+import 'package:pocketbudget/Models/wallet.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -26,8 +31,8 @@ class _HomePageState extends State<HomePage> {
 
   Future<double>? _calculateCurrentMonthTotal;
 
-  List<String> dropdownWallets = [];
-  String? selectedWallet;
+  Map<int, String> dropdownWallets = {};
+  int selectedWallet = 1;
   bool isExpense = true;
 
   @override
@@ -56,8 +61,9 @@ class _HomePageState extends State<HomePage> {
     Provider.of<WalletDatabase>(context, listen: false)
         .allWallets
         .forEach((element) {
-      dropdownWallets.add(element.name);
+      dropdownWallets.putIfAbsent(element.id, () => element.name);
     });
+
     showDialog(
         context: context,
         builder: (context) =>
@@ -79,21 +85,17 @@ class _HomePageState extends State<HomePage> {
                       Text(
                         "Wallet",
                       ),
-                      DropdownButton<String>(
+                      DropdownButton<int>(
                           borderRadius: BorderRadius.circular(10.0),
                           padding: EdgeInsets.symmetric(vertical: 12.0),
-                          value: selectedWallet ?? "default",
+                          value: selectedWallet ?? 1,
                           items: [
-                            const DropdownMenuItem(
-                              value: "default",
-                              child: Text("Default"),
-                            ),
-                            ...dropdownWallets.map((e) => DropdownMenuItem(
+                            ...dropdownWallets.keys.map((e) => DropdownMenuItem(
                                   value: e,
-                                  child: Text(e),
+                                  child: Text(dropdownWallets[e]!),
                                 ))
                           ],
-                          onChanged: (String? newSelect) {
+                          onChanged: (int? newSelect) {
                             if (newSelect != null) {
                               setState(() {
                                 selectedWallet = newSelect;
@@ -132,25 +134,74 @@ class _HomePageState extends State<HomePage> {
   void editExpenseBox({required Expense expense}) {
     String existingName = expense.name;
     String existingAmount = expense.amount.toString();
+    isExpense = expense.isExpense;
+    dropdownWallets.clear();
+    Provider.of<WalletDatabase>(context, listen: false)
+        .allWallets
+        .forEach((element) {
+      dropdownWallets.putIfAbsent(element.id, () => element.name);
+    });
+
+    // selectedWallet = expense.wallet!;
+
     showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-              title: Text("Edit Expense"),
-              content: Column(mainAxisSize: MainAxisSize.min, children: [
-                TextField(
-                  controller: nameController,
-                  decoration: InputDecoration(hintText: existingName),
-                ),
-                TextField(
-                  controller: amountController,
-                  decoration: InputDecoration(hintText: existingAmount),
-                )
-              ]),
-              actions: [
-                _editExpenseButton(expense),
-                _cancelButton(),
-              ],
-            ));
+        builder: (context) =>
+            StatefulBuilder(builder: (context, StateSetter setState) {
+              return AlertDialog(
+                title: Text("Edit Expense"),
+                content: Column(mainAxisSize: MainAxisSize.min, children: [
+                  TextField(
+                    controller: nameController,
+                    decoration: InputDecoration(hintText: existingName),
+                  ),
+                  TextField(
+                    controller: amountController,
+                    decoration: InputDecoration(hintText: existingAmount),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Wallet",
+                      ),
+                      DropdownButton<int>(
+                          borderRadius: BorderRadius.circular(10.0),
+                          padding: EdgeInsets.symmetric(vertical: 12.0),
+                          value: selectedWallet ?? 1,
+                          items: [
+                            ...dropdownWallets.keys.map((e) => DropdownMenuItem(
+                                  value: e,
+                                  child: Text(dropdownWallets[e]!),
+                                ))
+                          ],
+                          onChanged: null),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        isExpense ? "Expense" : "Income",
+                      ),
+                      CupertinoSwitch(
+                          activeColor: Colors.red,
+                          trackColor: Colors.green,
+                          value: isExpense,
+                          onChanged: (value) {
+                            setState(() {
+                              isExpense = value;
+                            });
+                          })
+                    ],
+                  ),
+                ]),
+                actions: [
+                  _editExpenseButton(expense),
+                  _cancelButton(),
+                ],
+              );
+            }));
   }
 
   //Delete Expense Box
@@ -258,7 +309,8 @@ class _HomePageState extends State<HomePage> {
                               monthlySummary: monthlySummary,
                               startMonth: startMonth);
                         }
-                        return const Center(child: Text("Loading..."));
+                        return Center(
+                            child: Lottie.asset("lib/images/loader.json"));
                       })),
               SizedBox(
                 height: 20,
@@ -298,14 +350,21 @@ class _HomePageState extends State<HomePage> {
             amountController.text.isNotEmpty) {
           //Pop Alert
           Navigator.pop(context);
+
+          double amount = convertStringToDouble(amountController.text);
           //Create expense instance
           Expense newExpense = Expense(
               name: nameController.text,
-              amount: convertStringToDouble(amountController.text),
+              amount: amount,
               date: DateTime.now(),
-              wallet: selectedWallet!);
+              isExpense: isExpense,
+              wallet: selectedWallet);
+          showProgressLoader(context);
+          await updateInWallet(amount, null);
           //Save expense to database
           await context.read<ExpenseDatabase>().createNewExpense(newExpense);
+          //close progress indicator
+          Navigator.of(context).pop();
           resetActions();
           refreshData();
         }
@@ -322,18 +381,24 @@ class _HomePageState extends State<HomePage> {
           //Pop Alert
           Navigator.pop(context);
           //Create expense instance
+          var amount = amountController.text.isNotEmpty
+              ? convertStringToDouble(amountController.text)
+              : expense.amount;
           Expense updatedExpense = Expense(
-              name: nameController.text.isNotEmpty
-                  ? nameController.text
-                  : expense.name,
-              amount: amountController.text.isNotEmpty
-                  ? convertStringToDouble(amountController.text)
-                  : expense.amount,
-              date: DateTime.now());
+            name: nameController.text.isNotEmpty
+                ? nameController.text
+                : expense.name,
+            isExpense: isExpense,
+            amount: amount,
+            date: DateTime.now(),
+            wallet: expense.wallet,
+          );
 
           int existingId = expense.id;
           //Update expense to database
-
+          showProgressLoader(context);
+          await updateInWallet(amount, expense);
+          Navigator.pop(context);
           await context
               .read<ExpenseDatabase>()
               .updateExpense(existingId, updatedExpense);
@@ -350,6 +415,14 @@ class _HomePageState extends State<HomePage> {
       onPressed: () async {
         resetActions();
         Navigator.pop(context);
+        Wallet? edittedWallet;
+        edittedWallet = await Wallet.getWalletById(expense.wallet!);
+        expense.isExpense
+            ? edittedWallet!.amount += expense.amount
+            : edittedWallet!.amount -= expense.amount;
+        await context
+            .read<WalletDatabase>()
+            .updateWallet(edittedWallet.id, edittedWallet);
         await context.read<ExpenseDatabase>().deleteExpense(expense.id);
         refreshData();
       },
@@ -358,6 +431,29 @@ class _HomePageState extends State<HomePage> {
         style: TextStyle(color: Colors.red),
       ),
     );
+  }
+
+  Future<void> updateInWallet(double amount, Expense? previousExpense) async {
+    Wallet? edittedWallet;
+    edittedWallet = await Wallet.getWalletById(selectedWallet);
+    if (previousExpense != null) {
+      //Recreate the orignal amount
+      previousExpense.isExpense
+          ? edittedWallet!.amount += previousExpense.amount
+          : edittedWallet!.amount -= previousExpense.amount;
+      //Perform the updated transaction
+      isExpense
+          ? edittedWallet.amount -= amount
+          : edittedWallet.amount += amount;
+    } else {
+      isExpense
+          ? edittedWallet!.amount -= amount
+          : edittedWallet!.amount += amount;
+    }
+
+    await context
+        .read<WalletDatabase>()
+        .updateWallet(edittedWallet.id, edittedWallet);
   }
 
   Widget _cancelButton() {
@@ -373,6 +469,6 @@ class _HomePageState extends State<HomePage> {
   void resetActions() {
     nameController.clear();
     amountController.clear();
-    selectedWallet = "default";
+    selectedWallet = 1;
   }
 }

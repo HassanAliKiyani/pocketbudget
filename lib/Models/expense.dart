@@ -1,4 +1,5 @@
 import 'package:isar/isar.dart';
+import 'package:pocketbudget/Database/database_init.dart';
 
 /*
 * Isra realted command to generate isar file
@@ -12,11 +13,15 @@ class Expense {
   final String name;
   final double amount;
   final DateTime date;
-  final String wallet;
+  bool isExpense;
+  int? wallet;
 
   Expense(
       {required this.name,
       required this.amount,
       required this.date,
-      this.wallet = "default"});
+      required this.isExpense,
+      this.wallet});
+
+  
 }

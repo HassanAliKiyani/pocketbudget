@@ -41,6 +41,8 @@ class ExpenseDatabase extends ChangeNotifier {
     notifyListeners();
   }
 
+  
+
   //UPDATE
 
   Future<void> updateExpense(int id, Expense updatedExpense) async {

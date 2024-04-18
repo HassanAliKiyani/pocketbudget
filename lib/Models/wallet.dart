@@ -1,4 +1,5 @@
 import 'package:isar/isar.dart';
+import 'package:pocketbudget/Database/database_init.dart';
 
 /*
 * Isra realted command to generate isar file
@@ -10,7 +11,7 @@ part 'wallet.g.dart';
 class Wallet {
   Id id = Isar.autoIncrement;
   final String name;
-  final double amount;
+  double amount;
   final DateTime creationDate;
   final DateTime lastTransaction;
 
@@ -19,4 +20,10 @@ class Wallet {
     required this.amount,
     required this.lastTransaction,
   }) : creationDate = DateTime.now();
+
+  static Future<Wallet?> getWalletById(int id) async {
+    Wallet? fetchWalletFromDb =
+        await IsarDatabaseInitializer.isar.wallets.get(id);
+    return fetchWalletFromDb;
+  }
 }

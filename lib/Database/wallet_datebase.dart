@@ -11,6 +11,32 @@ class WalletDatabase extends ChangeNotifier {
   /*
    * O P E R A T I O N S _ C R U D
    */
+
+  //Create default wallet
+
+  Future<void> createDefaultWallet() async {
+    try {
+      //add to db
+      List<Wallet> fetchWalletFromDb =
+          await IsarDatabaseInitializer.isar.wallets.where().findAll();
+      if (fetchWalletFromDb.isNotEmpty) {
+        return;
+      }
+      Wallet newWallet = Wallet(
+          name: "Default", amount: 10000, lastTransaction: DateTime.now());
+      await IsarDatabaseInitializer.isar
+          .writeTxn(() => IsarDatabaseInitializer.isar.wallets.put(newWallet));
+
+      //re-read
+      await readWallets();
+
+      //notify the UI
+      notifyListeners();
+    } catch (e) {
+      debugPrintStack();
+    }
+  }
+
   //CREATE - new Wallets
   Future<void> createNewWallet(Wallet newWallet) async {
     try {
