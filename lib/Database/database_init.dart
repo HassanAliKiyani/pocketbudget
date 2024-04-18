@@ -1,9 +1,7 @@
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pocketbudget/Database/wallet_datebase.dart';
 import 'package:pocketbudget/Models/expense.dart';
 import 'package:pocketbudget/Models/wallet.dart';
-import 'package:provider/provider.dart';
 
 //Singleton class for database connection
 class IsarDatabaseInitializer {
@@ -21,9 +19,4 @@ class IsarDatabaseInitializer {
     //List all collection to open connections with them
     isar = await Isar.open([ExpenseSchema, WalletSchema], directory: dir.path);
   }
-
-  static final IsarDatabaseInitializer instance =
-      IsarDatabaseInitializer._internal();
-
-  IsarDatabaseInitializer._internal() {}
 }

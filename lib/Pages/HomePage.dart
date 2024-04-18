@@ -2,8 +2,6 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:isar/isar.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pocketbudget/Components/custom_drawer.dart';
 import 'package:pocketbudget/Components/custom_list_tile.dart';
@@ -88,7 +86,7 @@ class _HomePageState extends State<HomePage> {
                       DropdownButton<int>(
                           borderRadius: BorderRadius.circular(10.0),
                           padding: EdgeInsets.symmetric(vertical: 12.0),
-                          value: selectedWallet ?? 1,
+                          value: selectedWallet,
                           items: [
                             ...dropdownWallets.keys.map((e) => DropdownMenuItem(
                                   value: e,
@@ -142,7 +140,7 @@ class _HomePageState extends State<HomePage> {
       dropdownWallets.putIfAbsent(element.id, () => element.name);
     });
 
-    // selectedWallet = expense.wallet!;
+    selectedWallet = expense.wallet!;
 
     showDialog(
         context: context,
@@ -168,7 +166,7 @@ class _HomePageState extends State<HomePage> {
                       DropdownButton<int>(
                           borderRadius: BorderRadius.circular(10.0),
                           padding: EdgeInsets.symmetric(vertical: 12.0),
-                          value: selectedWallet ?? 1,
+                          value: selectedWallet,
                           items: [
                             ...dropdownWallets.keys.map((e) => DropdownMenuItem(
                                   value: e,
@@ -257,6 +255,11 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Text(convertAmountToCurreny(snapshot.data ?? 0)),
                     Text(getMonthInitials(DateTime.now().month)),
+                    ElevatedButton(
+                        onPressed: () {
+                          refreshData();
+                        },
+                        child: Icon(Icons.refresh))
                   ],
                 );
               } else {
@@ -437,6 +440,8 @@ class _HomePageState extends State<HomePage> {
     Wallet? edittedWallet;
     edittedWallet = await Wallet.getWalletById(selectedWallet);
     if (previousExpense != null) {
+      //Seletected wallet is now the orignal wallet of it
+      // edittedWallet = await Wallet.getWalletById(previousExpense.wallet!);
       //Recreate the orignal amount
       previousExpense.isExpense
           ? edittedWallet!.amount += previousExpense.amount

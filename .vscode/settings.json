@@ -1,1 +1,4 @@
-{"dart.addConstAnnotations": false}
+{
+  "dart.addConstAnnotations": false,
+  "cmake.configureOnOpen": false
+}

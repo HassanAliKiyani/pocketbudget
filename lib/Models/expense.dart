@@ -1,5 +1,4 @@
 import 'package:isar/isar.dart';
-import 'package:pocketbudget/Database/database_init.dart';
 
 /*
 * Isra realted command to generate isar file
@@ -22,6 +21,4 @@ class Expense {
       required this.date,
       required this.isExpense,
       this.wallet});
-
-  
 }
