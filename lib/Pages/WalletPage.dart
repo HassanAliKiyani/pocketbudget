@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pocketbudget/Database/wallet_datebase.dart';
 import 'package:pocketbudget/Helper/helper_functions.dart';
 import 'package:pocketbudget/Models/wallet.dart';
+import 'package:pocketbudget/Pages/WalletDetailPage.dart';
 import 'package:provider/provider.dart';
 
 class WalletPage extends StatefulWidget {
@@ -14,6 +15,7 @@ class WalletPage extends StatefulWidget {
 class _WalletPageState extends State<WalletPage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController amountController = TextEditingController();
+  
 
   @override
   void initState() {
@@ -97,34 +99,45 @@ class _WalletPageState extends State<WalletPage> {
                         const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2),
                     itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color:
-                                  Theme.of(context).colorScheme.inversePrimary,
-                              borderRadius: BorderRadius.circular(12.0)),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              const Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Icon(
-                                  Icons.wallet,
-                                  size: 50,
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => WalletDetailsPage(
+                                      wallet: _allWallets.elementAt(index))));
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .inversePrimary,
+                                borderRadius: BorderRadius.circular(12.0)),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                const Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Icon(
+                                    Icons.wallet,
+                                    size: 50,
+                                  ),
                                 ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(_allWallets.elementAt(index).name),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(convertAmountToCurreny(
-                                    _allWallets.elementAt(index).amount)),
-                              ),
-                            ],
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child:
+                                      Text(_allWallets.elementAt(index).name),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(convertAmountToCurreny(
+                                      _allWallets.elementAt(index).amount)),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       );

@@ -8,10 +8,12 @@ class CustomListTile extends StatelessWidget {
     required this.trailing,
     required this.onEditPressed,
     required this.onDeletePressed,
+    this.leading,
   });
 
   final String title;
   final String trailing;
+  final leading;
   final void Function(BuildContext)? onEditPressed;
   final void Function(BuildContext)? onDeletePressed;
 
@@ -44,6 +46,7 @@ class CustomListTile extends StatelessWidget {
               color: Theme.of(context).colorScheme.tertiary,
               borderRadius: BorderRadius.circular(4.0)),
           child: ListTile(
+            leading: leading,
             title: Text(
               title,
               style: TextStyle(

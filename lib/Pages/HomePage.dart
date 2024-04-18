@@ -253,7 +253,10 @@ class _HomePageState extends State<HomePage> {
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(convertAmountToCurreny(snapshot.data ?? 0)),
+                    Expanded(
+                      flex: 2,
+                      child: Text(convertAmountToCurreny(snapshot.data ?? 0)),
+                    ),
                     Text(getMonthInitials(DateTime.now().month)),
                     ElevatedButton(
                         onPressed: () {

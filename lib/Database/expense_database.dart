@@ -41,8 +41,6 @@ class ExpenseDatabase extends ChangeNotifier {
     notifyListeners();
   }
 
-  
-
   //UPDATE
 
   Future<void> updateExpense(int id, Expense updatedExpense) async {
@@ -130,6 +128,48 @@ class ExpenseDatabase extends ChangeNotifier {
     //calculating the whole expenses
     double total =
         currentMonthExpenses.fold(0, (sum, expense) => sum + expense.amount);
+
+    return total;
+  }
+
+  Future<double> calculateWalletTotalTransations(int walletId) async {
+    await readExpenses();
+
+    List<Expense> walletTotal = _allExpenses.where((expense) {
+      return expense.wallet == walletId;
+    }).toList();
+
+    //calculating the whole transactional value
+    double total =
+        walletTotal.fold(0, (sum, expense)  {return expense.isExpense? sum - expense.amount:  sum + expense.amount;});
+
+    return total;
+  }
+
+  Future<double> calculateWalletTotalExpenses(int walletId) async {
+    await readExpenses();
+
+    List<Expense> walletExpenses = _allExpenses.where((expense) {
+      return expense.wallet == walletId && expense.isExpense;
+    }).toList();
+
+    //calculating the whole expenses
+    double total =
+        walletExpenses.fold(0, (sum, expense) => sum + expense.amount);
+
+    return total;
+  }
+
+  Future<double> calculateWalletTotalIncome(int walletId) async {
+    await readExpenses();
+
+    List<Expense> walletIncomes = _allExpenses.where((expense) {
+      return expense.wallet == walletId && !expense.isExpense;
+    }).toList();
+
+    //calculating the whole expenses
+    double total =
+        walletIncomes.fold(0, (sum, expense) => sum + expense.amount);
 
     return total;
   }
