@@ -18,11 +18,21 @@ class CustomDrawer extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                SizedBox(
-                  height: 90,
-                  child: Lottie.asset("lib/images/dollarsymbol.json"),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxHeight: 100,
+                    maxWidth: 100,
+                  ),
+                  child: AspectRatio(
+                    aspectRatio: 1,
+                    child: Image.asset(
+                      "lib/images/PocketBudget.png",
+                      fit: BoxFit.contain,
+                    ),
+                    // child: Lottie.asset("lib/images/dollarsymbol.json"),
+                  ),
                 ),
-                const Text("Pocket Wallet"),
+                const Text("Pocket Budget"),
               ],
             ),
           ),

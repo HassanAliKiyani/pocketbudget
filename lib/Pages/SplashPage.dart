@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:pocketbudget/Database/wallet_datebase.dart';
 import 'package:pocketbudget/Pages/HomePage.dart';
-import 'package:provider/provider.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -40,7 +38,11 @@ class _SplashPageState extends State<SplashPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Lottie.asset("lib/images/dollarsymbol.json"),
+        child: Image.asset(
+          "lib/images/PocketBudget.png",
+          fit: BoxFit.contain,
+        ),
+        // child: Lottie.asset("lib/images/dollarsymbol.json"),
       ),
     );
   }
