@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:pocketbudget/Database/expense_database.dart';
 import 'package:pocketbudget/Database/wallet_datebase.dart';
 import 'package:pocketbudget/Helper/helper_functions.dart';
+import 'package:pocketbudget/Models/expense.dart';
 import 'package:pocketbudget/Models/wallet.dart';
 import 'package:pocketbudget/Pages/WalletDetailPage.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +17,6 @@ class WalletPage extends StatefulWidget {
 class _WalletPageState extends State<WalletPage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController amountController = TextEditingController();
-  
 
   @override
   void initState() {
@@ -42,6 +43,18 @@ class _WalletPageState extends State<WalletPage> {
               ]),
               actions: [
                 _createButton(),
+                _cancelButton(),
+              ],
+            ));
+  }
+
+  void deleteExpenseBox({required Wallet wallet}) {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text("Delete Wallet"),
+              actions: [
+                _deleteWalletButton(wallet),
                 _cancelButton(),
               ],
             ));
@@ -100,6 +113,10 @@ class _WalletPageState extends State<WalletPage> {
                             crossAxisCount: 2),
                     itemBuilder: (context, index) {
                       return GestureDetector(
+                        onLongPress: () {
+                          deleteExpenseBox(
+                              wallet: _allWallets.elementAt(index));
+                        },
                         onTap: () {
                           Navigator.push(
                               context,
@@ -171,6 +188,33 @@ class _WalletPageState extends State<WalletPage> {
         }
       },
       child: Text("Save"),
+    );
+  }
+
+  Widget _deleteWalletButton(Wallet wallet) {
+    return MaterialButton(
+      onPressed: () async {
+        //Pop Alert
+        Navigator.pop(context);
+
+        //Get the connected Expenses with the wallet
+        List<Expense> expensesToUpdate = await context
+            .read<ExpenseDatabase>()
+            .getExpensesByWalletId(walletId: wallet.id);
+        for (var expense in expensesToUpdate) {
+          expense.wallet = 0;
+          await context
+              .read<ExpenseDatabase>()
+              .updateExpense(expense.id, expense);
+        }
+
+        //Remove the connected Expenses Id
+
+        //Delete the wallet
+
+        await context.read<WalletDatabase>().deleteWallet(wallet.id);
+      },
+      child: Text("Delete"),
     );
   }
 

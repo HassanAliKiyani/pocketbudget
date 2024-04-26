@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> {
   Future<double>? _calculateCurrentMonthTotal;
 
   Map<int, String> dropdownWallets = {};
-  int selectedWallet = 1;
+  int selectedWallet = 0;
   bool isExpense = true;
 
   @override
@@ -56,6 +56,7 @@ class _HomePageState extends State<HomePage> {
   //Create Expense Box
   void openExpenseBox() {
     dropdownWallets.clear();
+    dropdownWallets.putIfAbsent(0, () => "No Wallet");
     Provider.of<WalletDatabase>(context, listen: false)
         .allWallets
         .forEach((element) {
@@ -134,6 +135,7 @@ class _HomePageState extends State<HomePage> {
     String existingAmount = expense.amount.toString();
     isExpense = expense.isExpense;
     dropdownWallets.clear();
+    dropdownWallets.putIfAbsent(0, () => "No Wallet");
     Provider.of<WalletDatabase>(context, listen: false)
         .allWallets
         .forEach((element) {
@@ -366,6 +368,7 @@ class _HomePageState extends State<HomePage> {
               isExpense: isExpense,
               wallet: selectedWallet);
           showProgressLoader(context);
+
           await updateInWallet(amount, null);
           //Save expense to database
           await context.read<ExpenseDatabase>().createNewExpense(newExpense);
@@ -421,14 +424,16 @@ class _HomePageState extends State<HomePage> {
       onPressed: () async {
         resetActions();
         Navigator.pop(context);
-        Wallet? edittedWallet;
-        edittedWallet = await Wallet.getWalletById(expense.wallet!);
-        expense.isExpense
-            ? edittedWallet!.amount += expense.amount
-            : edittedWallet!.amount -= expense.amount;
-        await context
-            .read<WalletDatabase>()
-            .updateWallet(edittedWallet.id, edittedWallet);
+        if (expense.wallet != 0) {
+          Wallet? edittedWallet;
+          edittedWallet = await Wallet.getWalletById(expense.wallet!);
+          expense.isExpense
+              ? edittedWallet!.amount += expense.amount
+              : edittedWallet!.amount -= expense.amount;
+          await context
+              .read<WalletDatabase>()
+              .updateWallet(edittedWallet.id, edittedWallet);
+        }
         await context.read<ExpenseDatabase>().deleteExpense(expense.id);
         refreshData();
       },
@@ -440,6 +445,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> updateInWallet(double amount, Expense? previousExpense) async {
+    if (selectedWallet == 0) {
+      return;
+    }
+
     Wallet? edittedWallet;
     edittedWallet = await Wallet.getWalletById(selectedWallet);
     if (previousExpense != null) {
@@ -477,6 +486,6 @@ class _HomePageState extends State<HomePage> {
   void resetActions() {
     nameController.clear();
     amountController.clear();
-    selectedWallet = 1;
+    selectedWallet = 0;
   }
 }

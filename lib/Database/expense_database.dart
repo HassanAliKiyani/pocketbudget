@@ -132,6 +132,19 @@ class ExpenseDatabase extends ChangeNotifier {
     return total;
   }
 
+  /*
+  * W A L L E T _ H E L L P E R S
+  */
+
+  Future<List<Expense>> getExpensesByWalletId({required int walletId}) async {
+    List<Expense> fetchExpenseFromDb = await IsarDatabaseInitializer
+        .isar.expenses
+        .filter()
+        .walletEqualTo(walletId)
+        .findAll();
+    return fetchExpenseFromDb;
+  }
+
   Future<double> calculateWalletTotalTransations(int walletId) async {
     await readExpenses();
 
@@ -140,8 +153,9 @@ class ExpenseDatabase extends ChangeNotifier {
     }).toList();
 
     //calculating the whole transactional value
-    double total =
-        walletTotal.fold(0, (sum, expense)  {return expense.isExpense? sum - expense.amount:  sum + expense.amount;});
+    double total = walletTotal.fold(0, (sum, expense) {
+      return expense.isExpense ? sum - expense.amount : sum + expense.amount;
+    });
 
     return total;
   }

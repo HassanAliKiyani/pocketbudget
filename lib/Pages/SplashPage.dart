@@ -16,7 +16,7 @@ class _SplashPageState extends State<SplashPage> {
   void initState() {
     super.initState();
     _navigateToHomePage();
-    Provider.of<WalletDatabase>(context, listen: false).createDefaultWallet();
+    // Provider.of<WalletDatabase>(context, listen: false).createDefaultWallet();
   }
 
   _navigateToHomePage() {
