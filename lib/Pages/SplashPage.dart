@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pocketbudget/Pages/HomePage.dart';
+import 'package:pocketbudget/Theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -39,7 +41,9 @@ class _SplashPageState extends State<SplashPage> {
     return Scaffold(
       body: Center(
         child: Image.asset(
-          "lib/images/PocketBudget.png",
+          Provider.of<ThemeProvider>(context, listen: false).isDark
+              ? "lib/images/WhiteLogo.png"
+              : "lib/images/BlackLogo.png",
           fit: BoxFit.contain,
         ),
         // child: Lottie.asset("lib/images/dollarsymbol.json"),
