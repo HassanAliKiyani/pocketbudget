@@ -260,11 +260,15 @@ class _HomePageState extends State<HomePage> {
                       child: Text(convertAmountToCurreny(snapshot.data ?? 0)),
                     ),
                     Text(getMonthInitials(DateTime.now().month)),
-                    ElevatedButton(
+                    SizedBox(
+                      width: 4,
+                    ),
+                    IconButton(
                         onPressed: () {
                           refreshData();
                         },
-                        child: Icon(Icons.refresh))
+                        icon: Icon(Icons.refresh))
+                   
                   ],
                 );
               } else {
